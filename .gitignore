@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Local database — each person generates their own
+fitness.db
+
+# IDE
+.vscode/
+.idea/
+*.DS_Store
+
+# Generated files
+*.png

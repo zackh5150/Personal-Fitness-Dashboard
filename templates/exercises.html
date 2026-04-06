@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1>Exercise Suggestions</h1>
+<p>Find exercises based on your equipment and target muscles.</p>
+
+<!-- TODO (Christian - Functionality 4):
+     Build the exercise suggestion page.
+
+     What to add here:
+     - A form where the user picks a muscle group and/or equipment type
+     - When submitted, call the API Ninjas exercise API from app.py:
+       URL: https://api.api-ninjas.com/v1/exercises?muscle=biceps
+       Header: X-Api-Key: YOUR_API_KEY
+       (use the requests library: pip install requests)
+     - Display the results as a list of exercises
+     - Let the user rate exercises (1-5 stars) and save to exercise_ratings table
+     - Show their saved ratings
+
+     The "exercise_ratings" table is already set up in database.py.
+-->
+
+<div class="card">
+    <p><em>Exercise suggestions coming soon.</em></p>
+</div>
+{% endblock %}

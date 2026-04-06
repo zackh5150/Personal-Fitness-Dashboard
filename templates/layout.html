@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <div class="nav-title">Fitness Assistant</div>
+        <div class="nav-links">
+            <a href="/" class="{% if request.path == '/' %}active{% endif %}">Dashboard</a>
+            <a href="/log" class="{% if request.path == '/log' %}active{% endif %}">Workout Log</a>
+            <a href="/progress" class="{% if request.path == '/progress' %}active{% endif %}">Progress</a>
+            <a href="/exercises" class="{% if request.path == '/exercises' %}active{% endif %}">Exercises</a>
+            <a href="/schedule" class="{% if request.path == '/schedule' %}active{% endif %}">Schedule</a>
+            <a href="/profile" class="{% if request.path == '/profile' %}active{% endif %}">Profile</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
