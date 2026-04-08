@@ -1,25 +1,82 @@
 {% extends "layout.html" %}
-
 {% block content %}
-<h1>Workout Schedule</h1>
-<p>Plan and manage your upcoming workouts.</p>
+<div style="width:120%; overflow-x:auto;">
+<h2>Workout Scheduling</h2>
+<!-- =========================
+     UPCOMING WORKOUT
+========================= -->
+{% if upcoming %}
+  <div style="border:1px solid green; padding:10px; margin-bottom:15px; box-sizing:border-box;">
+    <h4>🏋️ Next Upcoming Workout:</h4>
+    <p>📅 {{ upcoming.scheduled_date | replace('T', '  ') }}</p>
+    <p>⏱️ {{ upcoming.duration_minutes }} mins</p>
+  </div>
+{% else %}
+  <p style="color:gray;">No upcoming workouts scheduled.</p>
+{% endif %}
+<!-- =========================
+     CREATE FORM
+========================= -->
+<form method="POST" action="/schedule/create">
+  <label>Date & Time:</label>
+  <input type="datetime-local" name="scheduled_date" required>
+  <label>Duration (mins):</label>
+  <input type="number" name="duration_minutes" value="60" required>  
+  <label>Notes:</label>
+  <input type="text" name="notes" placeholder="Optional notes">
+  <button type="submit">Create</button>
+</form>
+<hr>
+<br>
+<!-- =========================
+     LIST SCHEDULES
+========================= -->
+<h3>All Schedules</h3>
+<table border="1" cellpadding="5" style="width:100%; border-collapse: collapse;">
 
-<!-- TODO (Ha - Functionality 5):
-     Build the workout scheduling page.
+<tr>
+    <th>DateTime</th>
+    <th>Duration</th>
+    <th>Notes</th>
+    <th>Completed</th>
+    <th style="text-align: center;">Actions</th>
+  </tr>
+  
+  {% for s in schedules %}
+<tr>
+    <td style="text-align: center;">{{ s.scheduled_date | replace('T', ' ') }}</td>
+    <td style="text-align: center;">{{ s.duration_minutes }} mins</td>
+    <td style="text-align: center;">{{ s.notes }}</td>
+    <td style="text-align: center;">{{ s.completed }}</td>
+    
+    <td style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 10px;">
+      
+      <form action="/schedule/update/{{ s.id }}" method="POST" style="margin: 0;">
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin-bottom: 10px;">
+          <input type="datetime-local" name="scheduled_date"
+                 value="{{ s.scheduled_date | replace(' ', 'T') }}" required>
+          <label> Dur: </label>
+          <input type="number" name="duration_minutes"
+                 value="{{ s.duration_minutes }}" style="width:60px;" required> 
+          <label> Note:</label>
+          <input type="text" name="notes" value="{{ s.notes }}">  
+          <label> Status:</label>
+          <input type="number" name="completed" 
+                 value="{{ s.completed }}"
+                 min="0" max="1" style="width:30px; ">
+        </div>
 
-     What to add here:
-     - A form to create a new scheduled workout with fields for:
-       title, date/time, duration (minutes), notes
-     - The form should POST to a route you create in app.py
-     - A list of upcoming scheduled workouts from the database
-     - A "Mark Complete" button for each workout
-     - A "Delete" button for each workout
-
-     The "workout_schedules" table is already set up in database.py.
-     You just need to add the routes in app.py and the HTML here.
--->
-
-<div class="card">
-    <p><em>Scheduling coming soon.</em></p>
+        <div style="display: flex; justify-content: center; gap: 10px;">
+          <button type="submit">Update</button>
+      </form>
+          
+          <form action="/schedule/delete/{{ s.id }}" method="POST" style="margin: 0;">
+            <button type="submit">Delete</button>
+          </form>
+        </div>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
 </div>
 {% endblock %}
