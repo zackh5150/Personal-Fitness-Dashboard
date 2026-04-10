@@ -20,9 +20,8 @@ A local single-user fitness dashboard built with **Flask** and **SQLite**.
 
 ### 1. Clone & branch
 ```bash
-git clone https://github.com/YOUR_ORG/fitness-assistant.git
-cd fitness-assistant
-git checkout -b feature/your-feature-name
+git clone https://github.com/zackh5150/Personal-Fitness-Dashboard
+
 ```
 
 ### 2. Install & run
@@ -50,10 +49,10 @@ templates/
   layout.html         ← shared nav and page layout
   dashboard.html      ← home page
   profile.html        ← Functionality 1 (Colin)
-  log.html            ← Functionality 2 
-  progress.html       ← Functionality 3 
-  exercises.html      ← Functionality 4 
-  schedule.html       ← Functionality 5 
+  log.html            ← Functionality 2 (Zack)
+  progress.html       ← Functionality 3 (Aaron)
+  exercises.html      ← Functionality 4 (Christian)
+  schedule.html       ← Functionality 5 (Ha)
 ```
 
 ## How to add your functionality
@@ -64,10 +63,3 @@ templates/
 4. Use `database.py`'s `get_db()` to read/write from the database
 5. Test by running `python app.py` and checking your page
 
-## Branch Workflow
-
-1. Work on `feature/your-name` branch
-2. `git push origin feature/your-name`
-3. Open a Pull Request to main on GitHub
-4. Team lead reviews and merges
-5. `git checkout main && git pull` to sync

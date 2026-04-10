@@ -100,6 +100,30 @@ def log_page():
     # : query workout_logs table for user_id = 1
     db = get_db()
 
+
+    #  create a list of common gym equipment for the datalist in the form for allowing smart excercise suggestions based on available equipment
+    equipmentPool = [
+        "bench press machine", "bicep curl machine", "cable machine", "calf raise machine",
+        "chest fly machine / pec deck machine", "chest press machine", "dip machine", "elliptical machine",
+        "glute-ham developer", "hack squat machine", "high row machine", "hyperextension bench / roman chair",
+        "lat pulldown machine", "lateral raise machine", "leg curl machine", "leg extension machine",
+        "leg press machine", "leverage deadlift machine", "pullover machine", "rear delt fly machine",
+        "rowing machine", "seated back extension machine", "seated row machine", "shoulder press machine",
+        "shrug machine", "smith machine", "squat machine", "stair climber machine", "standing leg curl machine",
+        "t-bar row machine", "treadmill", "triceps extension machine", "adjustable bench", "decline bench",
+        "flat bench", "incline bench", "military press bench", "preacher bench", "bench", "barbell", "axle bar",
+        "body bar", "ez curl bar", "trap bar / hex bar", "strongman log", "dumbbell", "kettlebell", "weight plate",
+        "medicine ball", "power rack / squat rack", "barbell rack", "captain's chair", "pull-up bar",
+        "dip bars / parallel bars", "gymnastic rings", "cable handle / d-handle", "v-bar / row handle",
+        "rope attachment", "straight bar attachment", "lat pulldown bar", "ez bar attachment", "ankle strap",
+        "resistance band", "bfr bands / occlusion bands", "chain", "plyo box", "aerobic step", "block",
+        "platform", "exercise mat", "foam roller", "stability ball", "bosu ball", "weight belt / dip belt",
+        "head harness", "barbell pad", "barbell collars", "knee pad", "wrist wraps", "ankle weights", "weight vest",
+        "wrist weights", "atlas stone", "farmer's walk implements", "sled", "tire", "yoke", "sandbag", "keg",
+        "rickshaw frame", "conan's wheel", "circus bell", "stationary bike", "jump rope", "agility ladder",
+        "cone", "hurdle", "sliders", "anchor point / door anchor", "landmine attachment", "suspension trainer",
+        "towel", "wrist roller", "safety pins / j-hooks", "strap", "chair", "climbing rope", "heavy bag",
+        "sledgehammer", "wall", "training partner", "post", "stairs", "dowel / pvc pipe"]
     workouts= db.execute(
 
         "Select *" 
@@ -110,31 +134,31 @@ def log_page():
     ).fetchall()
     db.close()
 
-    # : pass the list of workouts to the template
-    return render_template("log.html", workouts=workouts)
+    #  pass the list of workouts and equipment pool to the template
+    return render_template("log.html", workouts=workouts, equipmentPool=equipmentPool)
 
 #  POST route for logging a new workout
+
 @app.route("/log/add", methods=["POST"])
 def add_workout():
 
     db = get_db()
     # Get form data and INSERT into workout_logs
     db.execute("""
-        INSERT INTO workout_logs (user_id, exercise_name, muscle_group, sets, reps, weight, notes)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    """, (
-        1,
-        request.form.get("exercise_name"),
-
-        request.form.get("muscle_group"),
-        request.form.get("sets") or None,
-
-        request.form.get("reps") or None,
-
-        request.form.get("weight") or None,
-
-        request.form.get("notes"),
-    ))
+               
+    INSERT INTO workout_logs (user_id, exercise_name, muscle_group, sets, reps, weight, notes, equipment)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+""", (
+    1,
+    request.form.get("exercise_name"),
+    request.form.get("muscle_group"),
+    request.form.get("sets") or None,
+    request.form.get("reps") or None,
+    request.form.get("weight") or None,
+    request.form.get("notes"),
+    # Added equipment for excercise funcionality 
+    request.form.get("equipment") or None,
+))
     db.commit()
     db.close()
     # - redirect back to /log
@@ -154,7 +178,9 @@ def delete_workout(workout_id):
         WHERE id = ? AND user_id = 1
     """, (workout_id,))
     db.commit()
+
     db.close()
+
     #  - redirect back to /log
     return redirect(url_for("log_page"))
 #    
