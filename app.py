@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 from database import get_db, init_db
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -14,6 +15,24 @@ def get_user():
     db.close()
     return user
 
+def getUpcomingWorkout(schedules):
+    now = datetime.now()
+    upcoming = None
+
+    for s in schedules:
+        try:
+            dt = datetime.strptime(s["scheduled_date"], "%Y-%m-%dT%H:%M")
+        except:
+            try:
+                dt = datetime.strptime(s["scheduled_date"], "%Y-%m-%d %H:%M")
+            except:
+                continue
+
+        if dt > now:
+            if upcoming is None or dt < upcoming[0]:
+                upcoming = (dt, s)
+
+    return upcoming[1] if upcoming else None
 
 # ---- Dashboard (home page) ----
 
@@ -175,25 +194,81 @@ def exercises_page():
 #  Functionality 5: Workout Scheduling (TODO - Ha)
 # ================================================================
 
+# VIEW SCHEDULE PAGE
+
 @app.route("/schedule")
 def schedule_page():
-    # TODO: query workout_schedules for user_id = 1, ordered by date
-    # TODO: pass the list to the template
-    return render_template("schedule.html")
+    db = get_db()
 
-# TODO: add a POST route for creating a new scheduled workout
-#       - read form fields: title, scheduled_date, duration_minutes, notes
-#       - INSERT into workout_schedules table
-#       - redirect back to /schedule
+    schedules = db.execute("""
+        SELECT * FROM workout_schedules
+        WHERE user_id = 1
+        ORDER BY scheduled_date ASC
+    """).fetchall()
 
-# TODO: add a POST route for marking a scheduled workout as completed
-#       - UPDATE workout_schedules SET completed = 1 WHERE id = ?
-#       - redirect back to /schedule
+    db.close()
 
-# TODO: add a POST route for deleting a scheduled workout
-#       - DELETE from workout_schedules WHERE id = ? AND user_id = 1
-#       - redirect back to /schedule
+    upcoming = getUpcomingWorkout(schedules)
 
+    return render_template("schedule.html", schedules=schedules, upcoming=upcoming)
+
+# CREATE SCHEDULE
+
+@app.route("/schedule/create", methods=["POST"])
+def create_schedule():
+    db = get_db()
+
+    scheduled_date = request.form["scheduled_date"]
+    duration = request.form["duration_minutes"]
+    notes = request.form.get("notes", "")
+
+    db.execute("""
+        INSERT INTO workout_schedules (user_id, scheduled_date, duration_minutes, notes, completed)
+        VALUES (1, ?, ?, ?, 0)
+    """, (scheduled_date, duration, notes))
+
+    db.commit()
+    db.close()
+
+    return redirect(url_for("schedule_page"))
+
+# UPDATE SCHEDULE
+
+@app.route("/schedule/update/<int:id>", methods=["POST"])
+def update_schedule(id):
+    db = get_db()
+
+    scheduled_date = request.form["scheduled_date"]
+    duration = request.form["duration_minutes"]
+    notes = request.form.get("notes", "")
+    completed = request.form.get("completed", 0)
+
+    db.execute("""
+        UPDATE workout_schedules
+        SET scheduled_date = ?, duration_minutes = ?, notes = ?, completed = ?
+        WHERE id = ? AND user_id = 1
+    """, (scheduled_date, duration, notes, completed, id))
+
+    db.commit()
+    db.close()
+
+    return redirect(url_for("schedule_page"))
+
+# DELETE SCHEDULE
+
+@app.route("/schedule/delete/<int:id>", methods=["POST"])
+def delete_schedule(id):
+    db = get_db()
+
+    db.execute("""
+        DELETE FROM workout_schedules
+        WHERE id = ? AND user_id = 1
+    """, (id,))
+
+    db.commit()
+    db.close()
+
+    return redirect(url_for("schedule_page"))
 
 # ---- start the server ----
 if __name__ == "__main__":

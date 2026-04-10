@@ -54,13 +54,12 @@ def init_db():
     """)
 
     c.execute("""
-        CREATE TABLE IF NOT EXISTS workout_schedules (
+         CREATE TABLE IF NOT EXISTS workout_schedules (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER,
-            title TEXT NOT NULL,
             scheduled_date TEXT,
             duration_minutes INTEGER DEFAULT 60,
-            notes TEXT,
+            notes TEXT DEFAULT '',
             completed INTEGER DEFAULT 0
         )
     """)
